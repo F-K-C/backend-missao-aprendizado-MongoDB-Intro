@@ -22,8 +22,9 @@ async function main() {
     const lista = ['Java', 'Kotlin', 'Android']
 
     // Endpoint Readl all (GET) /personagem
-    app.get('/personagem', function (req, res) {
-        res.send(lista.filter(Boolean))
+    app.get('/personagem', async function (req, res) {
+        const itens = await collection.find().toArray()
+        res.send(itens)
     })
 
     //EndPoint Read By ID
