@@ -41,22 +41,21 @@ async function main() {
     app.use(express.json())
 
     // Endpoint Create [Post]
-    app.post('/personagem', function (req, res) {
-        const body = req.body
+    app.post('/personagem', async function (req, res) {
+        const novoItem = req.body
 
-        const novoItem = body.nome
-
-        if (!novoItem) {
+        
+        if (!novoItem || !novoItem.nome) {
             return res.status(400).send('Corpo da requisição deve conter a propriedade `nome`.')
         }
 
-        if (lista.includes(novoItem)) {
-            return res.status(409).send('Esse item já existe na lista.')
-        }
+        // if (lista.includes(novoItem)) {
+        //     return res.status(409).send('Esse item já existe na lista.')
+        // }
 
-        lista.push(novoItem)
+        await collection.insertOne(novoItem)
 
-        res.status(201).send('Item adicionado com sucesso: ' + novoItem)
+        res.status(201).send(novoItem)
     })
 
 
