@@ -1,82 +1,99 @@
 const express = require('express')
-const app = express()
+const { MongoClient } = require('mongodb')
 
-app.get('/', function (req, res) {
-  res.send('Hello World')
-})
+const dbUrl = 'mongodb+srv://admin:khdaodoi3432987h@cluster0.4eooi5f.mongodb.net'
+const dbName = 'mongodb-intro-e-implementacao'
 
-const lista = ['Java', 'Kotlin', 'Android']
+async function main() {
+    const client = new MongoClient(dbUrl)
+    console.log('Conectando ao banco de dados....')
+    await client.connect()
+    console.log('Banco de dados conectado com sucesso!')
 
-// Endpoint Readl all (GET) /personagem
-app.get('/personagem', function(req, res){
-    res.send(lista.filter(Boolean))
-})
+    const db = client.db(dbName)
+    const collection = db.collection('personagem')
 
-//EndPoint Read By ID
-app.get('/personagem/:id', function(req, res) {
-    const id = req.params.id
-    const item = lista[id - 1]
+    const app = express()
 
-    if(!item){
-        return res.status(404).send('Item não encontrado.')
-    }
+    app.get('/', function (req, res) {
+        res.send('Hello World')
+    })
 
-    res.send(item)
-})
-app.use(express.json())
+    const lista = ['Java', 'Kotlin', 'Android']
 
-// Endpoint Create [Post]
-app.post('/personagem', function (req, res){
-    const body = req.body
+    // Endpoint Readl all (GET) /personagem
+    app.get('/personagem', function (req, res) {
+        res.send(lista.filter(Boolean))
+    })
 
-    const novoItem = body.nome
+    //EndPoint Read By ID
+    app.get('/personagem/:id', function (req, res) {
+        const id = req.params.id
+        const item = lista[id - 1]
 
-    if(!novoItem){
-        return res.status(400).send('Corpo da requisição deve conter a propriedade `nome`.')
-    }
+        if (!item) {
+            return res.status(404).send('Item não encontrado.')
+        }
 
-    if(lista.includes(novoItem)) {
-        return res.status(409).send('Esse item já existe na lista.')
-    }
+        res.send(item)
+    })
+    app.use(express.json())
 
-    lista.push(novoItem)
+    // Endpoint Create [Post]
+    app.post('/personagem', function (req, res) {
+        const body = req.body
 
-    res.status(201).send('Item adicionado com sucesso: '+ novoItem)
-})
+        const novoItem = body.nome
 
+        if (!novoItem) {
+            return res.status(400).send('Corpo da requisição deve conter a propriedade `nome`.')
+        }
 
-app.put('/personagem/:id', function(req, res){
-    const id = req.params.id
+        if (lista.includes(novoItem)) {
+            return res.status(409).send('Esse item já existe na lista.')
+        }
 
-    if(!lista[id-1]){
-        return res.status(404).send('Item não encontrado.')
-    }
+        lista.push(novoItem)
 
-    const body = req.body
-    const novoItem = body.nome
-
-    if(!novoItem){
-        return res.status(400).send('Corpo da requisição deve contar a propriedade `nome`.')
-    }
-
-    if(lista.includes(novoItem)) {
-        return res.status(409).send('Esse item já existe na lista.')
-    }
+        res.status(201).send('Item adicionado com sucesso: ' + novoItem)
+    })
 
 
-    lista[id-1] = novoItem
-    res.send('Item atualizado com sucesso: ' + id + ' - ' +  novoItem)
-})
+    app.put('/personagem/:id', function (req, res) {
+        const id = req.params.id
 
-app.delete('/personagem/:id', function(req, res) {
-    const id = req.params.id
+        if (!lista[id - 1]) {
+            return res.status(404).send('Item não encontrado.')
+        }
 
-    if(!lista[id-1]){
-        return res.status(404).send('Item não encontrado.')
-    }
-    
-    delete lista[id-1]
-    res.send('Item removido com sucesso: ' + id)
-})
+        const body = req.body
+        const novoItem = body.nome
 
-app.listen(3000)
+        if (!novoItem) {
+            return res.status(400).send('Corpo da requisição deve contar a propriedade `nome`.')
+        }
+
+        if (lista.includes(novoItem)) {
+            return res.status(409).send('Esse item já existe na lista.')
+        }
+
+
+        lista[id - 1] = novoItem
+        res.send('Item atualizado com sucesso: ' + id + ' - ' + novoItem)
+    })
+
+    app.delete('/personagem/:id', function (req, res) {
+        const id = req.params.id
+
+        if (!lista[id - 1]) {
+            return res.status(404).send('Item não encontrado.')
+        }
+
+        delete lista[id - 1]
+        res.send('Item removido com sucesso: ' + id)
+    })
+
+    app.listen(3000)
+}
+
+main()
