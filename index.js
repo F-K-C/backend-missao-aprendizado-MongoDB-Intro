@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 
 const dbUrl = 'mongodb+srv://admin:khdaodoi3432987h@cluster0.4eooi5f.mongodb.net'
 const dbName = 'mongodb-intro-e-implementacao'
@@ -28,9 +28,9 @@ async function main() {
     })
 
     //EndPoint Read By ID
-    app.get('/personagem/:id', function (req, res) {
+    app.get('/personagem/:id', async function (req, res) {
         const id = req.params.id
-        const item = lista[id - 1]
+        const item = await collection.findOne({ _id: new ObjectId(id) })
 
         if (!item) {
             return res.status(404).send('Item não encontrado.')
